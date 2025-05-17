@@ -1,55 +1,49 @@
-"""Entry point for the homework package."""
+import os
+import sys
 
-# python3 -m homework 10 data/raw data/input data/output
+from ._internals.count_words import CountWordsMixin
+from ._internals.preprocess_lines import PreprocessLinesMixin
+from ._internals.read_all_lines import ReadAllLinesMixin
+from ._internals.split_into_words import SplitIntoWordsMixin
+from ._internals.write_word_counts import WriteWordCountsMixin
 
-from homework.src.main import main
-import argparse
 
-class ArgumentParser:
+class ParseArgsMixin:
+    def parse_args(self):
+
+        if len(sys.argv) != 3:
+            print("Usage: python3 -m homework <input_folder> <output_folder>")
+            sys.exit(1)
+
+        self.input_folder = sys.argv[1]
+        self.output_folder = sys.argv[2]
+
+
+class WordCountApp(
+    ParseArgsMixin,
+    ReadAllLinesMixin,
+    PreprocessLinesMixin,
+    SplitIntoWordsMixin,
+    CountWordsMixin,
+    WriteWordCountsMixin,
+):
     def __init__(self):
-        
-        self.input = None
-        self.output = None
-    
+        self.input_folder = None
+        self.output_folder = None
+        self.lines = None
+        self.preprocessed_lines = None
+        self.words = None
+        self.word_counts = None
+
     def run(self):
-        
-        
 
-
-
-def parse_args():
-
-    
-
-    return parsed_args.input, parsed_args.output
-
-
-def read_all_lines(input_folder):
-    lines = []
-    for filename in os.listdir(input_folder):
-        file_path = os.path.join(input_folder, filename)
-        with open(file_path, "r", encoding="utf-8") as f:
-            lines.extend(f.readlines())
-    return lines
-
-
-
-
-
-
-def main():
-    argument_parser = ArgumentParser().run()
-    
-    file_reader = FileReader(argument_parser.input)
-    text_processor = TextProcessor()
-    
-    lines = file_reader.read_all_lines()
-    preprocessed_lines = text_processor.preprocess(lines)
-    words = text_processor.split_into_words(preprocessed_lines)
-
+        self.parse_args()
+        self.read_all_lines()
+        self.preprocess_lines()
+        self.split_into_words()
+        self.count_words()
+        self.write_word_counts()
 
 
 if __name__ == "__main__":
-    main()
-    
-    
+    WordCountApp().run()
